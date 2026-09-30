@@ -57,9 +57,13 @@ def submit_review(
     db: Session = Depends(get_db)
 ):
     """
-    Submits a human correction for a low-confidence ticket.
-    Saves the original vs corrected values, reviewer info, timestamp,
-    and updates ticket status to 'reviewed'.
+    Submits a human correction or manual routing override for a ticket.
+    - If ticket.status == 'review_required', this is a standard human review of an uncertain prediction.
+    - If ticket.status == 'routed' or payload.is_override, this is an intentional manual override of automated routing.
+    In both cases:
+    - The original Prediction record remains completely immutable.
+    - The human decision is logged into HumanReview for feedback retraining and audit trails.
+    - The ticket status transitions to 'reviewed'.
     """
     ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
     if not ticket:
@@ -72,7 +76,16 @@ def submit_review(
     if not pred:
         raise HTTPException(status_code=400, detail="Cannot review a ticket without prediction record")
 
-    # Record human review
+    is_override = bool(payload.is_override or ticket.status == "routed")
+    notes = payload.notes
+    if is_override:
+        prefix = "[Manual Override]"
+        if not notes:
+            notes = f"{prefix} Agent manually overrode automated routing."
+        elif not notes.startswith(prefix):
+            notes = f"{prefix} {notes}"
+
+    # Record human review (immutable record)
     review = HumanReview(
         ticket_id=ticket.id,
         original_category=pred.category,
@@ -81,7 +94,7 @@ def submit_review(
         corrected_urgency=payload.corrected_urgency,
         original_confidence=pred.category_confidence,
         reviewer=payload.reviewer,
-        notes=payload.notes
+        notes=notes
     )
     db.add(review)
 
@@ -90,10 +103,12 @@ def submit_review(
     db.commit()
     db.refresh(review)
 
+    action_label = "Manual override" if is_override else "Human review"
     logger.info(
-        f"Human review submitted for Ticket {ticket.id} by {payload.reviewer} | "
+        f"{action_label} recorded for Ticket {ticket.id} by {payload.reviewer} | "
         f"Category: {pred.category} -> {payload.corrected_category} | "
-        f"Urgency: {pred.urgency} -> {payload.corrected_urgency}"
+        f"Urgency: {pred.urgency} -> {payload.corrected_urgency} | "
+        f"Prediction record ID {pred.id} preserved intact."
     )
 
     return ReviewResponse(
@@ -104,8 +119,24 @@ def submit_review(
         original_urgency=review.original_urgency,
         corrected_urgency=review.corrected_urgency,
         reviewer=review.reviewer,
+        is_override=is_override,
+        notes=review.notes,
         created_at=review.created_at
     )
+
+
+@router.post("/{ticket_id}/override", response_model=ReviewResponse, status_code=status.HTTP_201_CREATED)
+def override_ticket_routing(
+    ticket_id: int,
+    payload: ReviewRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Explicit endpoint for human agents to manually override any ticket's routing
+    (including already auto-routed tickets).
+    """
+    payload.is_override = True
+    return submit_review(ticket_id=ticket_id, payload=payload, db=db)
 
 
 @router.get("/history", response_model=List[ReviewResponse])
@@ -115,4 +146,19 @@ def get_review_history(
 ):
     """Retrieve history of submitted human reviews."""
     reviews = db.query(HumanReview).order_by(desc(HumanReview.created_at)).limit(limit).all()
-    return reviews
+    response_items = []
+    for r in reviews:
+        is_override = bool(r.notes and "[Manual Override]" in r.notes)
+        response_items.append(ReviewResponse(
+            id=r.id,
+            ticket_id=r.ticket_id,
+            original_category=r.original_category,
+            corrected_category=r.corrected_category,
+            original_urgency=r.original_urgency,
+            corrected_urgency=r.corrected_urgency,
+            reviewer=r.reviewer,
+            is_override=is_override,
+            notes=r.notes,
+            created_at=r.created_at
+        ))
+    return response_items

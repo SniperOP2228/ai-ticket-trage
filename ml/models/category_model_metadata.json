@@ -2,7 +2,11 @@
   "model_name": "Random Forest",
   "model_version": "1.0.0",
   "task": "category_classification",
-  "features": "TF-IDF (max_features=10000, ngram_range=(1,2))",
+  "algorithm": "RandomForestClassifier",
+  "features": "TF-IDF (max_features=10000, ngram_range=(1,2), sublinear_tf=True)",
+  "calibration_method": "sigmoid (Platt scaling, 5-fold CV)",
+  "calibration_cv_folds": 5,
+  "is_calibrated": true,
   "n_categories": 10,
   "categories": [
     "Billing and Payments",
@@ -16,11 +20,13 @@
     "Service Outages and Maintenance",
     "Technical Support"
   ],
-  "val_accuracy": 0.5687815833801235,
-  "val_f1_macro": 0.5998967064853047,
-  "val_f1_weighted": 0.5730994336103526,
-  "test_accuracy": 0.5687815833801235,
-  "test_f1_macro": 0.5998967064853047,
-  "test_f1_weighted": 0.5730994336103526,
-  "random_seed": 42
+  "val_accuracy": 0.5502526670409882,
+  "val_f1_macro": 0.56044231877661,
+  "val_f1_weighted": 0.5458073846131196,
+  "test_accuracy": 0.5539023020774846,
+  "test_f1_macro": 0.5820029234488804,
+  "test_f1_weighted": 0.5502575624770032,
+  "uncalibrated_val_f1_macro": 0.5671864320072462,
+  "random_seed": 42,
+  "saved_at": "2026-09-30 14:27:04 UTC"
 }

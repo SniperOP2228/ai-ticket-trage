@@ -34,6 +34,8 @@ data/raw/*.parquet
 data/processed/*.csv
 data/processed/*.parquet
 data/processed/*.npy
+ml/models/candidates/
+
 
 # Node & Frontend
 **/node_modules/

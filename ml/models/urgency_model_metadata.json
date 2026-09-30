@@ -2,13 +2,23 @@
   "model_name": "Random Forest",
   "model_version": "1.0.0",
   "task": "urgency_classification",
-  "features": "TF-IDF (max_features=8000, ngram_range=(1,2))",
+  "algorithm": "RandomForestClassifier",
+  "features": "TF-IDF (max_features=8000, ngram_range=(1,2), sublinear_tf=True)",
+  "calibration_method": "sigmoid (Platt scaling, 5-fold CV)",
+  "calibration_cv_folds": 5,
+  "is_calibrated": true,
   "labels": [
     "High",
     "Low",
     "Medium"
   ],
-  "test_accuracy": 0.6962380685008422,
-  "test_f1_macro": 0.6822330541184417,
-  "test_f1_weighted": 0.6934924431047995
+  "val_accuracy": 0.6479505895564289,
+  "val_f1_macro": 0.6285258101555367,
+  "val_f1_weighted": 0.6431523027784476,
+  "test_accuracy": 0.652442448062886,
+  "test_f1_macro": 0.6308788986396173,
+  "test_f1_weighted": 0.6474705878416249,
+  "uncalibrated_val_f1_macro": 0.637647228576525,
+  "random_seed": 42,
+  "saved_at": "2026-09-30 14:28:22 UTC"
 }

@@ -61,14 +61,24 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Enable CORS for frontend integration
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# Configure CORS for frontend integration
+configured_origins = [o.strip() for o in settings.cors_origins.split(",") if o.strip()]
+if "*" in configured_origins:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+else:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=configured_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 # Mount API v1 Routers
 app.include_router(predict_router, prefix="/api/v1")

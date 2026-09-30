@@ -1,0 +1,161 @@
+{
+  "principle": "If a model outputs 0.80 confidence, calibration checks whether predictions in that range are correct ~80% of the time.",
+  "category_calibration": {
+    "model": "CalibratedClassifierCV (RandomForest, sigmoid, 5-fold CV)",
+    "test_samples": 3562,
+    "brier_score": 0.5884754143826871,
+    "expected_calibration_error_ece": 0.09844963322301098,
+    "maximum_calibration_error_mce": 0.2977288737893117,
+    "bin_breakdown": [
+      {
+        "bin_range": "(0.00, 0.10]",
+        "count": 0,
+        "avg_confidence": 0.05,
+        "accuracy": 0.0,
+        "gap": 0.0
+      },
+      {
+        "bin_range": "(0.10, 0.20]",
+        "count": 0,
+        "avg_confidence": 0.15000000000000002,
+        "accuracy": 0.0,
+        "gap": 0.0
+      },
+      {
+        "bin_range": "(0.20, 0.30]",
+        "count": 495,
+        "avg_confidence": 0.26908332135622487,
+        "accuracy": 0.296969696969697,
+        "gap": 0.027886375613472125
+      },
+      {
+        "bin_range": "(0.30, 0.40]",
+        "count": 1089,
+        "avg_confidence": 0.3539914764338585,
+        "accuracy": 0.379247015610652,
+        "gap": 0.025255539176793518
+      },
+      {
+        "bin_range": "(0.40, 0.50]",
+        "count": 1025,
+        "avg_confidence": 0.4462216742121954,
+        "accuracy": 0.5609756097560976,
+        "gap": 0.11475393554390223
+      },
+      {
+        "bin_range": "(0.50, 0.60]",
+        "count": 435,
+        "avg_confidence": 0.5425818292601544,
+        "accuracy": 0.7908045977011494,
+        "gap": 0.248222768440995
+      },
+      {
+        "bin_range": "(0.60, 0.70]",
+        "count": 169,
+        "avg_confidence": 0.6430995285775523,
+        "accuracy": 0.9408284023668639,
+        "gap": 0.2977288737893117
+      },
+      {
+        "bin_range": "(0.70, 0.80]",
+        "count": 81,
+        "avg_confidence": 0.7437245192075604,
+        "accuracy": 0.8518518518518519,
+        "gap": 0.10812733264429142
+      },
+      {
+        "bin_range": "(0.80, 0.90]",
+        "count": 116,
+        "avg_confidence": 0.8619343342263348,
+        "accuracy": 0.9827586206896551,
+        "gap": 0.12082428646332033
+      },
+      {
+        "bin_range": "(0.90, 1.00]",
+        "count": 152,
+        "avg_confidence": 0.9297318657927025,
+        "accuracy": 1.0,
+        "gap": 0.0702681342072975
+      }
+    ]
+  },
+  "urgency_calibration": {
+    "model": "CalibratedClassifierCV (RandomForest, sigmoid, 5-fold CV)",
+    "test_samples": 3562,
+    "brier_score": 0.46790907044115826,
+    "expected_calibration_error_ece": 0.06207051845860586,
+    "maximum_calibration_error_mce": 0.1208015295339725,
+    "bin_breakdown": [
+      {
+        "bin_range": "(0.00, 0.10]",
+        "count": 0,
+        "avg_confidence": 0.05,
+        "accuracy": 0.0,
+        "gap": 0.0
+      },
+      {
+        "bin_range": "(0.10, 0.20]",
+        "count": 0,
+        "avg_confidence": 0.15000000000000002,
+        "accuracy": 0.0,
+        "gap": 0.0
+      },
+      {
+        "bin_range": "(0.20, 0.30]",
+        "count": 0,
+        "avg_confidence": 0.25,
+        "accuracy": 0.0,
+        "gap": 0.0
+      },
+      {
+        "bin_range": "(0.30, 0.40]",
+        "count": 165,
+        "avg_confidence": 0.37674375940255656,
+        "accuracy": 0.36363636363636365,
+        "gap": 0.013107395766192909
+      },
+      {
+        "bin_range": "(0.40, 0.50]",
+        "count": 911,
+        "avg_confidence": 0.4550805810689442,
+        "accuracy": 0.47530186608122943,
+        "gap": 0.020221285012285206
+      },
+      {
+        "bin_range": "(0.50, 0.60]",
+        "count": 1025,
+        "avg_confidence": 0.5463134586916871,
+        "accuracy": 0.6117073170731707,
+        "gap": 0.0653938583814836
+      },
+      {
+        "bin_range": "(0.60, 0.70]",
+        "count": 688,
+        "avg_confidence": 0.6455312477236339,
+        "accuracy": 0.7543604651162791,
+        "gap": 0.10882921739264517
+      },
+      {
+        "bin_range": "(0.70, 0.80]",
+        "count": 402,
+        "avg_confidence": 0.7448701122570722,
+        "accuracy": 0.8656716417910447,
+        "gap": 0.1208015295339725
+      },
+      {
+        "bin_range": "(0.80, 0.90]",
+        "count": 231,
+        "avg_confidence": 0.8471048696712241,
+        "accuracy": 0.8744588744588745,
+        "gap": 0.027354004787650377
+      },
+      {
+        "bin_range": "(0.90, 1.00]",
+        "count": 140,
+        "avg_confidence": 0.9376665755987452,
+        "accuracy": 0.9642857142857143,
+        "gap": 0.02661913868696908
+      }
+    ]
+  }
+}

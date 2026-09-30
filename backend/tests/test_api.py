@@ -129,3 +129,68 @@ def test_model_info_endpoint(client: TestClient):
     assert "urgency_model" in data
     assert "confidence_threshold" in data
     assert "model_version" in data
+
+
+def test_manual_override_and_prediction_immutability(client: TestClient):
+    """Test that manual override updates ticket status while keeping prediction record immutable."""
+    # Create a prediction
+    pred_res = client.post("/api/v1/predict", json={
+        "text": "My server crashed with out of memory error. Database is unreachable."
+    })
+    assert pred_res.status_code == 201
+    pred_data = pred_res.json()
+    ticket_id = pred_data["ticket_id"]
+    orig_cat = pred_data["category"]
+    orig_urg = pred_data["urgency"]
+    orig_conf = pred_data["category_confidence"]
+
+    # Explicit manual override
+    override_payload = {
+        "corrected_category": "Billing and Payments",
+        "corrected_urgency": "Low",
+        "reviewer": "operations_lead",
+        "notes": "Customer mistakenly filed infra issue under wrong account billing",
+        "is_override": True
+    }
+    override_res = client.post(f"/api/v1/review/{ticket_id}/override", json=override_payload)
+    assert override_res.status_code == 201
+    override_data = override_res.json()
+    assert override_data["is_override"] is True
+    assert "[Manual Override]" in override_data["notes"]
+    assert override_data["corrected_category"] == "Billing and Payments"
+    assert override_data["corrected_urgency"] == "Low"
+
+    # Verify ticket status transitioned to reviewed
+    ticket_res = client.get(f"/api/v1/tickets/{ticket_id}")
+    assert ticket_res.status_code == 200
+    ticket_data = ticket_res.json()
+    assert ticket_data["status"] == "reviewed"
+
+    # Verify original prediction in DB remains completely unchanged
+    assert ticket_data["category"] == orig_cat
+    assert ticket_data["urgency"] == orig_urg
+    assert ticket_data["category_confidence"] == orig_conf
+
+    # Verify review history records the override
+    history_res = client.get("/api/v1/review/history")
+    assert history_res.status_code == 200
+    history_data = history_res.json()
+    assert any(h["ticket_id"] == ticket_id and h["is_override"] is True for h in history_data)
+
+
+def test_review_queue_filtering(client: TestClient):
+    """Verify review queue only includes tickets requiring human review."""
+    # Ensure a ticket requiring review exists
+    pred_res = client.post("/api/v1/predict", json={
+        "text": "Help with misc question."
+    })
+    ticket_id = pred_res.json()["ticket_id"]
+
+    queue_res = client.get("/api/v1/review/queue")
+    assert queue_res.status_code == 200
+    queue_data = queue_res.json()
+    assert isinstance(queue_data, list)
+    for item in queue_data:
+        assert "ticket_id" in item
+        assert "predicted_category" in item
+        assert "category_confidence" in item

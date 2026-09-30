@@ -1,0 +1,118 @@
+{
+  "selection_methodology": "Threshold chosen using validation set performance trade-off; evaluated once on untouched test set.",
+  "selected_threshold": 0.8,
+  "validation_threshold_table": [
+    {
+      "threshold": 0.5,
+      "auto_routed_count": 790,
+      "review_count": 2772,
+      "coverage": 0.22178551375631667,
+      "review_rate": 0.7782144862436833,
+      "auto_route_category_accuracy": 0.8658227848101265,
+      "auto_route_both_accuracy": 0.7493670886075949,
+      "auto_route_category_error_rate": 0.13417721518987347
+    },
+    {
+      "threshold": 0.6,
+      "auto_routed_count": 272,
+      "review_count": 3290,
+      "coverage": 0.0763615946097698,
+      "review_rate": 0.9236384053902302,
+      "auto_route_category_accuracy": 0.9264705882352942,
+      "auto_route_both_accuracy": 0.8455882352941176,
+      "auto_route_category_error_rate": 0.07352941176470584
+    },
+    {
+      "threshold": 0.7,
+      "auto_routed_count": 95,
+      "review_count": 3467,
+      "coverage": 0.026670409882088714,
+      "review_rate": 0.9733295901179113,
+      "auto_route_category_accuracy": 0.9263157894736842,
+      "auto_route_both_accuracy": 0.8842105263157894,
+      "auto_route_category_error_rate": 0.0736842105263158
+    },
+    {
+      "threshold": 0.8,
+      "auto_routed_count": 38,
+      "review_count": 3524,
+      "coverage": 0.010668163952835485,
+      "review_rate": 0.9893318360471645,
+      "auto_route_category_accuracy": 0.8947368421052632,
+      "auto_route_both_accuracy": 0.868421052631579,
+      "auto_route_category_error_rate": 0.10526315789473684
+    },
+    {
+      "threshold": 0.9,
+      "auto_routed_count": 4,
+      "review_count": 3558,
+      "coverage": 0.0011229646266142617,
+      "review_rate": 0.9988770353733858,
+      "auto_route_category_accuracy": 1.0,
+      "auto_route_both_accuracy": 1.0,
+      "auto_route_category_error_rate": 0.0
+    }
+  ],
+  "test_threshold_table": [
+    {
+      "threshold": 0.5,
+      "auto_routed_count": 771,
+      "review_count": 2791,
+      "coverage": 0.21645143177989892,
+      "review_rate": 0.7835485682201011,
+      "auto_route_category_accuracy": 0.8975356679636836,
+      "auto_route_both_accuracy": 0.7756160830090791,
+      "auto_route_category_error_rate": 0.10246433203631644
+    },
+    {
+      "threshold": 0.6,
+      "auto_routed_count": 295,
+      "review_count": 3267,
+      "coverage": 0.0828186412128018,
+      "review_rate": 0.9171813587871982,
+      "auto_route_category_accuracy": 0.9661016949152542,
+      "auto_route_both_accuracy": 0.8949152542372881,
+      "auto_route_category_error_rate": 0.03389830508474578
+    },
+    {
+      "threshold": 0.7,
+      "auto_routed_count": 114,
+      "review_count": 3448,
+      "coverage": 0.032004491858506456,
+      "review_rate": 0.9679955081414935,
+      "auto_route_category_accuracy": 0.9649122807017544,
+      "auto_route_both_accuracy": 0.9385964912280702,
+      "auto_route_category_error_rate": 0.03508771929824561
+    },
+    {
+      "threshold": 0.8,
+      "auto_routed_count": 48,
+      "review_count": 3514,
+      "coverage": 0.01347557551937114,
+      "review_rate": 0.9865244244806288,
+      "auto_route_category_accuracy": 1.0,
+      "auto_route_both_accuracy": 1.0,
+      "auto_route_category_error_rate": 0.0
+    },
+    {
+      "threshold": 0.9,
+      "auto_routed_count": 5,
+      "review_count": 3557,
+      "coverage": 0.001403705783267827,
+      "review_rate": 0.9985962942167321,
+      "auto_route_category_accuracy": 1.0,
+      "auto_route_both_accuracy": 1.0,
+      "auto_route_category_error_rate": 0.0
+    }
+  ],
+  "final_test_benchmark_at_selected_threshold": {
+    "threshold": 0.8,
+    "auto_routed_count": 48,
+    "review_count": 3514,
+    "coverage": 0.01347557551937114,
+    "review_rate": 0.9865244244806288,
+    "auto_route_category_accuracy": 1.0,
+    "auto_route_both_accuracy": 1.0,
+    "auto_route_category_error_rate": 0.0
+  }
+}

@@ -65,15 +65,16 @@ class TicketListResponse(BaseModel):
 # ============================================================
 
 class ReviewRequest(BaseModel):
-    """Request body for submitting a human review."""
+    """Request body for submitting a human review or manual override."""
     corrected_category: str
     corrected_urgency: str
     reviewer: str = "reviewer"
     notes: Optional[str] = None
+    is_override: Optional[bool] = False
 
 
 class ReviewResponse(BaseModel):
-    """Response for a submitted review."""
+    """Response for a submitted review or manual override."""
     id: int
     ticket_id: int
     original_category: str
@@ -81,6 +82,8 @@ class ReviewResponse(BaseModel):
     original_urgency: str
     corrected_urgency: str
     reviewer: str
+    is_override: bool = False
+    notes: Optional[str] = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

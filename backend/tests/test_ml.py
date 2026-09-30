@@ -78,3 +78,43 @@ def test_queue_mapping():
     assert predictor._map_queue("Technical Support") == "technical_support"
     assert predictor._map_queue("Billing and Payments") == "billing_support"
     assert predictor._map_queue("Customer Service") == "customer_service"
+
+
+def test_probability_calibration_properties():
+    """Verify that predictions use calibrated probabilities summing to ~1.0."""
+    import numpy as np
+    from sklearn.calibration import CalibratedClassifierCV
+
+    if not predictor.is_loaded:
+        predictor.load_models()
+
+    assert isinstance(predictor.category_model, CalibratedClassifierCV)
+    assert isinstance(predictor.urgency_model, CalibratedClassifierCV)
+
+    sample_texts = [
+        "Refund request for unauthorized transaction on my credit card",
+        "Website displays 502 bad gateway when loading inventory",
+        "Can I change my registered email address in account settings?"
+    ]
+
+    for t in sample_texts:
+        cleaned = predictor.clean_text(t)
+        cat_vec = predictor.category_vectorizer.transform([cleaned])
+        urg_vec = predictor.urgency_vectorizer.transform([cleaned])
+
+        cat_probs = predictor.category_model.predict_proba(cat_vec)[0]
+        urg_probs = predictor.urgency_model.predict_proba(urg_vec)[0]
+
+        # Valid probabilities
+        assert np.all(cat_probs >= 0.0) and np.all(cat_probs <= 1.0)
+        assert np.all(urg_probs >= 0.0) and np.all(urg_probs <= 1.0)
+
+        # Must sum to 1.0 within floating point precision
+        assert np.isclose(np.sum(cat_probs), 1.0, atol=1e-4)
+        assert np.isclose(np.sum(urg_probs), 1.0, atol=1e-4)
+
+
+def test_empty_or_whitespace_prediction_handling():
+    """Predictor should raise ValueError on empty or whitespace-only input after cleaning."""
+    with pytest.raises(ValueError, match="Text is empty after cleaning"):
+        predictor.predict("   ", confidence_threshold=0.80)

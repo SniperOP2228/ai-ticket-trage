@@ -5,7 +5,11 @@ The machine learning pipeline is designed with strict production engineering sta
 - **Reproducibility**: All random seeds pinned to `42`.
 - **Zero Data Leakage**: Stratified splits performed prior to any feature extraction; TF-IDF fit strictly on training samples only.
 - **Multi-Task Decoupling**: Separate models for Category Classification and Urgency Prediction, recognizing that domain categories and priority signals rely on distinct linguistic features.
-- **Calibrated Scoring**: Threshold-based routing rather than blind probability acceptance.
+- **Calibrated Probabilities**: Raw tree ensemble probabilities are calibrated using 5-fold cross-validated Platt scaling (sigmoid) on training data.
+- **Explainability**: Linguistic feature attribution extracted from calibrated fold estimators weighted by document TF-IDF vectors.
+- **Closed-Loop Active Learning**: Continuous feedback loop allowing human reviewer corrections to retrain candidate models with automated test-set validation before promotion.
+
+---
 
 ## 2. Text Preprocessing Pipeline
 Customer tickets contain unstructured noise, email headers, boilerplate signatures, and URLs. The preprocessing routine (`clean_text`) applies:
@@ -22,29 +26,34 @@ Customer tickets contain unstructured noise, email headers, boilerplate signatur
    - Preserves high-signal urgency and domain keywords: `urgent`, `refund`, `failed`, `blocked`, `payment`, `error`, `outage`, `crash`.
 5. **Whitespace Canonicalization**: Multi-spaces and linebreaks collapsed to single spaces.
 
+---
+
 ## 3. Train / Validation / Test Splitting Strategy
 
 ```
 Total Clean Tickets: 23,747
   │
-  ├── 70% Train (16,622 tickets)  ──> Model Training & Feature Extraction
+  ├── 70% Train (16,622 tickets)  ──> Feature Extraction, Model Training & 5-Fold Calibration
   │
-  ├── 15% Val   (3,562 tickets)   ──> Hyperparameter Tuning & Model Selection
+  ├── 15% Val   (3,562 tickets)   ──> Model Selection & Operating Threshold Tuning
   │
-  └── 15% Test  (3,562 tickets)   ──> Held-out Final Benchmark (Touched ONCE)
+  └── 15% Test  (3,562 tickets)   ──> Held-out Final Benchmark & Reliability Evaluation (Touched ONCE)
 ```
 
-### Data Leakage Inspection
+### Data Leakage Safeguards
 - Verified pairwise text overlap:
   - $\text{Train} \cap \text{Val} = 0$
   - $\text{Train} \cap \text{Test} = 0$
   - $\text{Val} \cap \text{Test} = 0$
 - No target-derived features or temporal metadata included in inference features.
+- Calibration parameters fitted strictly on the training partition via cross-validation; test set preserved untouched.
+
+---
 
 ## 4. Feature Engineering Strategies
 
 ### Strategy A: N-Gram TF-IDF Bag-of-Words
-- **Vocabulary Size**: 10,000 maximum features.
+- **Vocabulary Size**: 10,000 maximum features (Category), 8,000 maximum features (Urgency).
 - **N-Gram Range**: Unigrams and Bigrams `(1, 2)`.
 - **Sublinear Term Frequency**: Enabled ($1 + \log(\text{TF})$) to discount recurring repetitive words.
 - **Frequency Cutoffs**: `min_df=2` (filters typo noise), `max_df=0.95` (filters corpus-wide stopwords).
@@ -53,7 +62,24 @@ Total Clean Tickets: 23,747
 - **Model**: `all-MiniLM-L6-v2` (~80MB, 384-dimensional dense vectors).
 - **Inference Latency**: Batch encoding at ~66 texts/second on CPU (~243 seconds total for training corpus).
 
-## 5. Model Benchmarking & Comparison
+---
+
+## 5. Probability Calibration Methodology
+
+Raw Random Forest `predict_proba()` computes the proportion of trees voting for a class. In multi-class settings with class imbalance, this is known to produce overconfident or poorly calibrated probability distributions.
+
+1. **Platt Scaling (Sigmoid)**: Fits a logistic transformation on out-of-fold predictions using 5-fold cross-validation (`cv=5`) directly on training data.
+2. **Why Not Isotonic Regression?**:
+   - Isotonic regression fits a non-parametric, monotonic step function.
+   - With 10 classes and severe support disparities (e.g., `General Inquiry` with 238 training examples vs. `Technical Support` with 4,800), isotonic regression overfits and creates piecewise flat probability artifacts.
+   - Platt sigmoid calibration applies a smooth parametric sigmoid regularized across folds.
+3. **Artifact Compression**:
+   - Deep Random Forest ensembles exceed 150MB uncompressed, violating GitHub's 100MB file limit.
+   - We apply `joblib.dump(..., compress=3)`, reducing `category_model.joblib` to 75.9MB and `urgency_model.joblib` to 62.8MB with zero precision loss.
+
+---
+
+## 6. Model Benchmarking (Validation Set)
 
 ### Category Classification (10 Classes)
 
@@ -75,8 +101,18 @@ Total Clean Tickets: 23,747
 | **Random Forest (Selected)** | TF-IDF (8k) | **68.95%** | **0.6761** | **0.6871** | 15.78s |
 | **Logistic Regression** | Embeddings (384d) | 43.77% | 0.4305 | 0.4410 | 2.50s |
 
-## 6. Engineering Analysis: TF-IDF vs. Dense Embeddings
-In this domain-specific technical support dataset:
-1. **Vocabulary Specificity**: High-signal terminology (`500 internal server error`, `refund duplicate`, `malwarebytes`, `failed payout`) is sparse and discriminative. N-gram TF-IDF cleanly isolates these terms with high feature weights.
-2. **Dense Vector Dispersion**: General-purpose MiniLM embeddings map general conversational text effectively but lose sensitivity to rare domain-specific technical acronyms without task-specific fine-tuning.
-3. **Operational Feasibility**: TF-IDF transforms in **1.5 seconds** vs. **243 seconds** for transformer embedding on CPU, requiring 10x less memory footprint for cloud deployment.
+---
+
+## 7. Active Learning & Human Feedback Retraining Pipeline
+
+The system establishes a closed-loop human-in-the-loop retraining mechanism:
+
+1. **Extraction & Validation (`scripts/build_feedback_dataset.py`)**:
+   - Queries `human_reviews` table from PostgreSQL/SQLite.
+   - Validates that corrected categories and urgencies match canonical label sets.
+   - Strips blank/corrupted records and writes clean feedback samples to `data/processed/human_feedback.csv`.
+2. **Candidate Retraining & Gating (`scripts/retrain_from_feedback.py`)**:
+   - Augments base training data with verified human corrections.
+   - Retrains the candidate category and urgency pipelines with 5-fold sigmoid calibration.
+   - Evaluates the candidate against the baseline model on held-out test data.
+   - Candidate models are written to `ml/models/candidates/` and are **only promoted** to production if explicitly approved via the `--promote` CLI flag.
