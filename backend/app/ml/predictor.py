@@ -18,6 +18,7 @@ from typing import Optional, Dict, List, Tuple
 
 import numpy as np
 import joblib
+from scipy import sparse
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +44,22 @@ class TicketPredictor:
         self.urgency_metadata = None
         self.is_loaded = False
 
+    @staticmethod
+    def _ensure_tfidf_transformer_state(vectorizer):
+        """Restore TF-IDF internals required by older scikit-learn runtimes."""
+        tfidf = getattr(vectorizer, "_tfidf", None)
+        if tfidf is None:
+            return
+        idf = tfidf.__dict__.get("idf_")
+        if idf is None or hasattr(tfidf, "_idf_diag"):
+            return
+        tfidf._idf_diag = sparse.spdiags(
+            idf,
+            diags=0,
+            m=len(idf),
+            n=len(idf),
+        )
+
     def load_models(self):
         """Load all trained calibrated models from disk."""
         try:
@@ -52,6 +69,8 @@ class TicketPredictor:
             self.category_vectorizer = joblib.load(MODEL_DIR / "tfidf_vectorizer.joblib")
             self.urgency_model = joblib.load(MODEL_DIR / "urgency_model.joblib")
             self.urgency_vectorizer = joblib.load(MODEL_DIR / "urgency_tfidf_vectorizer.joblib")
+            self._ensure_tfidf_transformer_state(self.category_vectorizer)
+            self._ensure_tfidf_transformer_state(self.urgency_vectorizer)
 
             # Load metadata
             cat_meta_path = MODEL_DIR / "category_model_metadata.json"
