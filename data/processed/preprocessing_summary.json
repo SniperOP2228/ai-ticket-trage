@@ -1,0 +1,28 @@
+{
+  "total_records": 23747,
+  "train_records": 16622,
+  "val_records": 3562,
+  "test_records": 3562,
+  "n_categories": 10,
+  "categories": [
+    "Technical Support",
+    "Returns and Exchanges",
+    "Billing and Payments",
+    "Sales and Pre-Sales",
+    "Service Outages and Maintenance",
+    "Product Support",
+    "IT Support",
+    "Customer Service",
+    "Human Resources",
+    "General Inquiry"
+  ],
+  "n_urgency_levels": 3,
+  "urgency_levels": [
+    "High",
+    "Medium",
+    "Low"
+  ],
+  "random_seed": 42,
+  "category_source": "queue",
+  "priority_mapping": "numeric 1\u2192Low, 2\u2192Medium, 3\u2192High"
+}

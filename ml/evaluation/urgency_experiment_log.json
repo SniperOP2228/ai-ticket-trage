@@ -1,0 +1,57 @@
+{
+  "experiment_id": "urgency_v1",
+  "task": "urgency_classification",
+  "models": [
+    {
+      "model": "Logistic Regression",
+      "accuracy": 0.5393037619314992,
+      "precision_macro": 0.5283188536476122,
+      "recall_macro": 0.5413508871898363,
+      "f1_macro": 0.5302831922912358,
+      "f1_weighted": 0.5426827297126833,
+      "inference_time_seconds": 0.0016176700592041016,
+      "training_time_seconds": 1.0857796669006348
+    },
+    {
+      "model": "Multinomial NB",
+      "accuracy": 0.4957888826501965,
+      "precision_macro": 0.48900306152979306,
+      "recall_macro": 0.4388915276012426,
+      "f1_macro": 0.43453189024315914,
+      "f1_weighted": 0.47491707037291553,
+      "inference_time_seconds": 0.0020203590393066406,
+      "training_time_seconds": 0.03592395782470703
+    },
+    {
+      "model": "Linear SVM",
+      "accuracy": 0.5670971364402021,
+      "precision_macro": 0.5818107857835789,
+      "recall_macro": 0.5112037131584666,
+      "f1_macro": 0.5151475112288119,
+      "f1_weighted": 0.5503287437942727,
+      "inference_time_seconds": 0.008243560791015625,
+      "training_time_seconds": 3.815487861633301
+    },
+    {
+      "model": "Random Forest",
+      "accuracy": 0.6895002807411567,
+      "precision_macro": 0.7047550981477405,
+      "recall_macro": 0.6625413818298829,
+      "f1_macro": 0.6760764283226953,
+      "f1_weighted": 0.6871182474052128,
+      "inference_time_seconds": 0.11282205581665039,
+      "training_time_seconds": 15.782956838607788
+    }
+  ],
+  "best_model": "Random Forest",
+  "best_f1_macro": 0.6760764283226953,
+  "test_metrics": {
+    "model": "Random Forest",
+    "accuracy": 0.6962380685008422,
+    "precision_macro": 0.7135571984935387,
+    "recall_macro": 0.6675973053578831,
+    "f1_macro": 0.6822330541184417,
+    "f1_weighted": 0.6934924431047995,
+    "inference_time_seconds": 0.15102410316467285
+  }
+}

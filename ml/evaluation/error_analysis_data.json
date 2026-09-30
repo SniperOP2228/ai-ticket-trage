@@ -1,0 +1,10 @@
+{
+  "category_accuracy": 0.5687815833801235,
+  "urgency_accuracy": 0.6962380685008422,
+  "total_test_samples": 3562,
+  "category_errors": 1536,
+  "urgency_errors": 1082,
+  "low_confidence_pct": 96.85569904548007,
+  "avg_confidence_correct": 0.2947285736450685,
+  "avg_confidence_incorrect": 0.18463427274519054
+}

@@ -1,0 +1,132 @@
+======================================================================
+ERROR ANALYSIS REPORT
+======================================================================
+
+Overall Category Accuracy: 0.5688 (2026/3562)
+Overall Urgency Accuracy: 0.6962 (2480/3562)
+Category errors: 1536
+Urgency errors: 1082
+
+======================================================================
+MOST CONFUSED CATEGORIES
+======================================================================
+
+Top 10 confusion pairs (Actual -> Predicted):
+  Technical Support -> Customer Service: 192 errors
+  Product Support -> Technical Support: 183 errors
+  Customer Service -> Technical Support: 112 errors
+  Product Support -> Customer Service: 107 errors
+  IT Support -> Technical Support: 91 errors
+  Technical Support -> Product Support: 83 errors
+  IT Support -> Customer Service: 74 errors
+  Customer Service -> Product Support: 52 errors
+  Billing and Payments -> Customer Service: 50 errors
+  Technical Support -> IT Support: 43 errors
+
+======================================================================
+TEXT LENGTH vs ACCURACY
+======================================================================
+
+Category Accuracy by Text Length:
+  Very Short (<=10): accuracy=0.565, n=62, avg_confidence=0.197
+  Short (11-25): accuracy=0.521, n=484, avg_confidence=0.207
+  Medium (26-50): accuracy=0.559, n=914, avg_confidence=0.238
+  Long (51-100): accuracy=0.604, n=1830, avg_confidence=0.265
+  Very Long (>100): accuracy=0.452, n=272, avg_confidence=0.241
+
+======================================================================
+CONFIDENCE vs ACCURACY
+======================================================================
+
+Category Accuracy by Confidence Level:
+  Confidence <0.5: accuracy=0.531, n=3264
+  Confidence 0.5-0.6: accuracy=0.912, n=57
+  Confidence 0.6-0.7: accuracy=1.000, n=49
+  Confidence 0.7-0.8: accuracy=1.000, n=80
+  Confidence 0.8-0.9: accuracy=1.000, n=76
+  Confidence 0.9-1.0: accuracy=1.000, n=36
+
+======================================================================
+PER-CLASS PERFORMANCE
+======================================================================
+
+Category Classification Report:
+                                 precision    recall  f1-score   support
+
+           Billing and Payments       0.89      0.72      0.80       363
+               Customer Service       0.38      0.55      0.45       536
+                General Inquiry       0.84      0.51      0.63        51
+                Human Resources       0.72      0.52      0.61        69
+                     IT Support       0.60      0.46      0.52       425
+                Product Support       0.57      0.45      0.51       664
+          Returns and Exchanges       0.73      0.62      0.67       176
+            Sales and Pre-Sales       0.56      0.65      0.60       108
+Service Outages and Maintenance       0.57      0.68      0.62       141
+              Technical Support       0.56      0.62      0.59      1029
+
+                       accuracy                           0.57      3562
+                      macro avg       0.64      0.58      0.60      3562
+                   weighted avg       0.59      0.57      0.57      3562
+
+
+Urgency Classification Report:
+              precision    recall  f1-score   support
+
+        High       0.70      0.71      0.70      1356
+         Low       0.77      0.53      0.63       714
+      Medium       0.67      0.77      0.72      1492
+
+    accuracy                           0.70      3562
+   macro avg       0.71      0.67      0.68      3562
+weighted avg       0.70      0.70      0.69      3562
+
+
+======================================================================
+SAMPLE MISCLASSIFIED TICKETS (Category)
+======================================================================
+(Text truncated to 100 chars for readability)
+
+  Text: "enhance investment analysis tools customer support, reaching out for the optimization of investment ..."
+  Actual: Returns and Exchanges | Predicted: Customer Service | Confidence: 0.120
+
+  Text: "support for integrating project management saas tools need assistance with integrating project manag..."
+  Actual: Product Support | Predicted: IT Support | Confidence: 0.123
+
+  Text: "require assistance in optimizing investments via h2o.ai financial analytics tools"
+  Actual: Customer Service | Predicted: Product Support | Confidence: 0.126
+
+  Text: "data concerns facing challenges with data analytics related to investment optimization."
+  Actual: Technical Support | Predicted: Product Support | Confidence: 0.126
+
+  Text: "required assistance with sage accounting able to supply details"
+  Actual: Technical Support | Predicted: Customer Service | Confidence: 0.127
+
+  Text: "security measures for medical information which security measures are advised?"
+  Actual: Product Support | Predicted: IT Support | Confidence: 0.127
+
+  Text: "unanticipated delays in accessing protected medical information owing to software compatibility prob..."
+  Actual: Service Outages and Maintenance | Predicted: Product Support | Confidence: 0.127
+
+  Text: "protection of hospital infrastructure share information on safeguarding hospital systems."
+  Actual: Customer Service | Predicted: Product Support | Confidence: 0.128
+
+  Text: "offer comprehensive instructions for integrating malwarebytes with wix."
+  Actual: Technical Support | Predicted: IT Support | Confidence: 0.128
+
+  Text: "request assistance regarding data pipeline failure"
+  Actual: Product Support | Predicted: Technical Support | Confidence: 0.128
+
+======================================================================
+SUMMARY & RECOMMENDATIONS
+======================================================================
+
+- 96.9% of predictions have confidence < 0.80 (would trigger human review)
+- Average confidence for correct: 0.295
+- Average confidence for incorrect: 0.185
+- Hardest category to classify: Technical Support
+
+Recommendations:
+  1. Consider adding more training data for underperforming categories
+  2. Very short tickets (<10 words) may benefit from additional context
+  3. The confidence threshold of 0.80 is appropriate based on confidence-accuracy analysis
+  4. Human review corrections can be used to retrain and improve the model
