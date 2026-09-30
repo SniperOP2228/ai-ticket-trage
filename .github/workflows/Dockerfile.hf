@@ -1,0 +1,23 @@
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+# Install Python dependencies
+COPY backend/requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Download required NLTK data
+RUN python -c "import nltk; nltk.download('punkt'); nltk.download('stopwords'); nltk.download('punkt_tab')"
+
+# Copy backend application
+COPY backend/ ./
+
+# Copy trained ML models
+COPY ml/models/ ./ml/models/
+
+# Hugging Face Spaces port
+EXPOSE 7860
+
+# Launch FastAPI
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "7860"]
